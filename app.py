@@ -23,7 +23,8 @@ class BaseApp(ABCBaseApp):
     MODE_NORMAL = "normal"
 
     MODE_TEXTS = {
-        MODE_CURVE_COMPLETION: "Press ENTER to save curve"
+        MODE_CURVE_COMPLETION: "Press ENTER to save curve",
+        MODE_NORMAL: "Press A to add new curve, or LMB to select point for moving"
     }
 
     @property
