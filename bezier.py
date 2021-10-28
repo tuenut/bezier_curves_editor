@@ -17,7 +17,7 @@ class BezierCurve(ABCBezierCurve):
     __selected_point: Union[pygame.Vector2, None] = None
 
     def __init__(self, vertices: list = None, curve_resolution: int = 30):
-        self.vertices = vertices if vertices else []
+        self.vertices = [pygame.Vector2(v) for v in vertices] if vertices else []
         self.vectors: List[pygame.Vector2] = []
 
         self.set_resolution(curve_resolution)

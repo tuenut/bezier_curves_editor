@@ -1,4 +1,5 @@
 import pygame
+import json
 
 from typing import List, Tuple
 
@@ -141,7 +142,33 @@ class CurveManipulatingMixin(BaseApp):
         raise NotImplementedError
 
 
-class App(CurveCreatingMixin, CurveManipulatingMixin):
+class DataManagement(BaseApp):
+    @property
+    def data(self):
+        data = {"curves": []}
+
+        for curve in self._curves:
+            curve_data = {
+                "points": [(v.x, v.y) for v in curve.vectors],
+                "vertices": [(v.x, v.y) for v in curve.vertices]
+            }
+            data["curves"].append(curve_data)
+
+        return data
+
+    def save(self):
+        with open("trek.json", "w") as file:
+            json.dump(self.data, file, indent=4)
+
+    def open(self):
+        with open("trek.json", "r") as file:
+            data = json.load(file)
+
+        for curve in data["curves"]:
+            self._curves.append(BezierCurve(curve["vertices"]))
+
+
+class App(CurveCreatingMixin, CurveManipulatingMixin, DataManagement):
     FPS = 100
 
     def __init__(self):
@@ -210,6 +237,16 @@ class App(CurveCreatingMixin, CurveManipulatingMixin):
             event_type=pygame.KEYDOWN,
             conditions={"key": pygame.K_a},
             callback=self._add_curve
+        )
+        self.events.subscribe(
+            event_type=pygame.KEYDOWN,
+            conditions={"key": pygame.K_s},
+            callback=self.save
+        )
+        self.events.subscribe(
+            event_type=pygame.KEYDOWN,
+            conditions={"key": pygame.K_o},
+            callback=self.open
         )
 
     def _set_mouse_default(self):
