@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 @as_singleton
 class EventManager:
     def __init__(self):
-        self.logger.debug("Init events manager.")
+        logger.debug("Init events manager.")
 
         self.__store = SubscriptionsStore()
         self.__events = []
@@ -63,7 +63,7 @@ class EventManager:
 
         TODO: looks like not enough useful method, may be should be removed.
         """
-        cls.logger.debug(f"Manual dispatching <{event_type}> "
+        logger.debug(f"Manual dispatching <{event_type}> "
                          f"with kwargs <{kwargs}>.")
 
         event = pygame.event.Event(event_type, kwargs)
@@ -72,17 +72,17 @@ class EventManager:
     def handle_events(self):
         """Used to check and handle events in mainloop."""
 
-        self.logger.debug("Start handling pygame events.")
+        logger.debug("Start handling pygame events.")
 
         self.__events = pygame.event.get()
         for event in self.__events:
-            self.logger.debug(f"Handle <{event}>")
+            logger.debug(f"Handle <{event}>")
             self._handle_event(event)
 
-        self.logger.debug("Clear events.")
+        logger.debug("Clear events.")
         self.__events = []
 
-        self.logger.debug("End of handling pygame events.")
+        logger.debug("End of handling pygame events.")
 
     def _handle_event(self, event):
         for subscription in self.__store[event.type]:
@@ -110,7 +110,7 @@ class EventManager:
                 for arg_name in kwargs_list
             }
         except AttributeError:
-            self.logger.exception(
+            logger.exception(
                 f"Try get kwargs <{kwargs_list}> for callback, but event <{event}>"
                 f" has no some attrs."
             )

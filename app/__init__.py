@@ -3,7 +3,6 @@ from typing import List, Tuple
 
 import pygame
 
-from app import EventManager
 from app.events import EventManager
 from bezier import BezierCurve
 from render import AppRender

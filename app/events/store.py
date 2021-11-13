@@ -6,7 +6,7 @@ import logging
 
 from typing import Dict
 
-from app.events import EventSubscription
+from app.events.subscriptions import EventSubscription
 
 logger = logging.getLogger(__name__)
 
