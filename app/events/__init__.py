@@ -23,9 +23,7 @@ class EventManager:
             callback: Callable,
             on_key_down: Optional[int] = None,
             on_mouse_button: Optional[int] = None,
-            on_event: Optional[int] = None,
-            kwargs: Optional[list] = None,
-            as_args: bool = False
+            on_event: Optional[int] = None
     ) -> str:
         """Subscribe some callback to event
 
@@ -33,14 +31,8 @@ class EventManager:
         :param on_mouse_button: Subscribe on mouse button click.
         :param on_event: Subscribe on specific event.
         :param callback: Callback method to handle event.
-            Method interface may be generic(*args, **kwargs) - use param `kwargs`
-             to say which attributes from Event object shold be passed as their
-             names **kwargs in callback, set `as_args=True` to pass it as *args.
-        :param kwargs: List of Event attributes names that should be passed to
-            callback.
-        :param as_args: If `True`, **kwargs will be pass as *args with their
-            position in `kwargs` param.
-
+            Method interface should be:
+             `callback(event: pygame.event.Event) -> None`
         :return: Subscription id. Can be used to unsubscribe.
         :rtype str
         """
@@ -63,9 +55,7 @@ class EventManager:
         subscription = EventSubscription(
             callback=callback,
             event_type=event_type,
-            conditions=conditions,
-            kwargs=kwargs,
-            as_args=as_args
+            conditions=conditions
         )
         self.__store.add(subscription)
 
@@ -113,26 +103,5 @@ class EventManager:
             if not subscription.check_conditions(event):
                 continue
 
-            kwargs = self.__extract_kwargs(event, subscription.kwargs)
-            if subscription.as_args:
-                subscription.callback(*kwargs.values())
-            else:
-                subscription.callback(**kwargs)
+            subscription.callback(event)
 
-    @staticmethod
-    def __extract_kwargs(event: pygame.event.Event,
-                         kwargs_list: List[str]) -> dict:
-        if kwargs_list is None:
-            return {}
-
-        try:
-            return {
-                arg_name: getattr(event, arg_name)
-                for arg_name in kwargs_list
-            }
-        except AttributeError:
-            logger.exception(
-                f"Try get kwargs <{kwargs_list}> for callback, but event "
-                f"<{event}> has no some attrs."
-            )
-            raise

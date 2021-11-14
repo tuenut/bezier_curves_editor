@@ -26,11 +26,16 @@ class SubscriptionsStore:
         self.__store[subscription.event_type][subscription.id] = subscription
         self.__stored_indices[subscription.id] = subscription.event_type
 
-    def remove(self, subscription_id: str) -> None:
+    def remove(self, subscription_id: str) -> bool:
+        if subscription_id not in self.__stored_indices:
+            return False
+
         event_type = self.__stored_indices[subscription_id]
 
         del self.__store[event_type][subscription_id]
         del self.__stored_indices[subscription_id]
+
+        return True
 
     def __getitem__(self, event_type):
         return list(self.__store[event_type].values())

@@ -20,9 +20,7 @@ class EventSubscription:
                  callback: Callable,
                  event_type: int,
                  subtype: Optional[int] = None,
-                 conditions: Optional[Dict[str, Any]] = None,
-                 kwargs: Optional[List[str]] = None,
-                 as_args: bool = False):
+                 conditions: Optional[Dict[str, Any]] = None):
         """
         :param event_type: Should be one of pygame events, like `pygame.KEYDOWN`
         :param callback: Callback method to handle event.
@@ -32,20 +30,12 @@ class EventSubscription:
         :param subtype: Used for user custom Event types. TODO: not fully implemented
         :param conditions: Use to check some Event attribute with value in this
             dict stored in key as attribute name.
-        :param kwargs: List of Event attributes names that should be passed to
-            callback.
-        :param as_args: If `True`, **kwargs will be pass as *args with their
-            position in `kwargs` param.
-
-        :return: Subscription id. Can be used to unsubscribe.
-        :rtype str
         """
 
         logger.debug(
             f"Subscribe callback <{callback}> on event_type <{event_type}>."
         )
         logger.debug(f"Conditions <{conditions}>.")
-        logger.debug(f"Kwargs <{kwargs}>.")
         logger.debug(f"Subtype <{subtype}>")
 
         index = id(callback)
@@ -55,8 +45,6 @@ class EventSubscription:
 
         self.subtype = subtype
         self.conditions = conditions if conditions else {}
-        self.kwargs = kwargs if kwargs else []
-        self.as_args = as_args
 
         self.__id = f"{str(event_type)}.{index}"
 
