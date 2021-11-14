@@ -4,6 +4,7 @@ from typing import List, Tuple
 import pygame
 
 from app.events import EventManager
+from app.events.subscriptions import LMB, RMB
 from bezier import BezierCurve
 from render import AppRender
 from utils.types import ABCBaseApp
@@ -42,16 +43,14 @@ class CurveCreatingMixin(BaseApp):
 
         self.events.unsubscribe(self._mouse_LMB_event_id)
         self._mouse_LMB_event_id = self.events.subscribe(
-            event_type=pygame.MOUSEBUTTONDOWN,
-            conditions={"button": 1},
+            on_mouse_button=LMB,
             callback=self._add_point_to_temp_curve,
             kwargs=["pos"],
             as_args=True
         )
         self.events.unsubscribe(self._esc_event_id)
         self._esc_event_id = self.events.subscribe(
-            event_type=pygame.KEYDOWN,
-            conditions={"key": pygame.K_ESCAPE},
+            on_key_down=pygame.K_ESCAPE,
             callback=self._interrupt_adding_curve,
         )
 
@@ -73,8 +72,7 @@ class CurveCreatingMixin(BaseApp):
             self.state["mode"] = self.MODE_CURVE_COMPLETION
 
             self._enter_event_id = self.events.subscribe(
-                event_type=pygame.KEYDOWN,
-                conditions={"key": pygame.K_RETURN},
+                on_key_down=pygame.K_RETURN,
                 callback=self._complete_curve
             )
 
@@ -107,20 +105,17 @@ class CurveManipulatingMixin(BaseApp):
     def _set_events_for_moving_point(self):
         self.events.unsubscribe(self._mouse_LMB_event_id)
         self._mouse_LMB_event_id = self.events.subscribe(
-            event_type=pygame.MOUSEBUTTONDOWN,
-            conditions={"button": 1},
+            on_mouse_button=LMB,
             callback=self._save_point_position,
         )
         self.events.unsubscribe(self._mouse_RMB_event_id)
         self._mouse_RMB_event_id = self.events.subscribe(
-            event_type=pygame.MOUSEBUTTONDOWN,
-            conditions={"button": 3},
+            on_mouse_button=RMB,
             callback=self._cancel_point_selection
         )
         self.events.unsubscribe(self._esc_event_id)
         self._esc_event_id = self.events.subscribe(
-            event_type=pygame.KEYDOWN,
-            conditions={"key": pygame.K_ESCAPE},
+            on_key_down=pygame.K_ESCAPE,
             callback=self._cancel_point_selection
         )
 
@@ -224,28 +219,24 @@ class App(CurveCreatingMixin, CurveManipulatingMixin, DataManagement):
         self._set_mouse_default()
 
         self.events.subscribe(
-            event_type=pygame.QUIT,
+            on_event=pygame.QUIT,
             callback=self._exit
         )
         self.events.subscribe(
-            event_type=pygame.KEYDOWN,
+            on_key_down=pygame.K_q,
             callback=self._exit,
-            conditions={"key": pygame.K_q}
         )
 
         self.events.subscribe(
-            event_type=pygame.KEYDOWN,
-            conditions={"key": pygame.K_a},
+            on_key_down=pygame.K_a,
             callback=self._add_curve
         )
         self.events.subscribe(
-            event_type=pygame.KEYDOWN,
-            conditions={"key": pygame.K_s},
+            on_key_down=pygame.K_s,
             callback=self.save
         )
         self.events.subscribe(
-            event_type=pygame.KEYDOWN,
-            conditions={"key": pygame.K_o},
+            on_key_down=pygame.K_o,
             callback=self.open
         )
 
@@ -254,8 +245,7 @@ class App(CurveCreatingMixin, CurveManipulatingMixin, DataManagement):
             self.events.unsubscribe(self._mouse_LMB_event_id)
 
         self._mouse_LMB_event_id = self.events.subscribe(
-            event_type=pygame.MOUSEBUTTONDOWN,
-            conditions={"button": 1},
+            on_mouse_button=LMB,
             callback=self._select_point,
             kwargs=["pos"],
             as_args=True
@@ -265,8 +255,7 @@ class App(CurveCreatingMixin, CurveManipulatingMixin, DataManagement):
             self.events.unsubscribe(self._mouse_RMB_event_id)
 
         self._mouse_RMB_event_id = self.events.subscribe(
-            event_type=pygame.MOUSEBUTTONDOWN,
-            conditions={"button": 3},
+            on_mouse_button=RMB,
             callback=self._do_nothing_callback,
         )
 
@@ -275,9 +264,8 @@ class App(CurveCreatingMixin, CurveManipulatingMixin, DataManagement):
             self.events.unsubscribe(self._esc_event_id)
 
         self._esc_event_id = self.events.subscribe(
-            event_type=pygame.KEYDOWN,
+            on_key_down=pygame.K_ESCAPE,
             callback=self._exit,
-            conditions={"key": pygame.K_ESCAPE}
         )
 
     def _do_nothing_callback(self):

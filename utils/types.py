@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TypedDict, Union, Tuple, List, Optional
+from typing import TypedDict, Union, Tuple, List, Optional, Callable
 
 import pygame
 
@@ -56,10 +56,9 @@ class ABCEvenManager(ABC):
     @abstractmethod
     def subscribe(
             self,
-            event_type,
-            callback,
-            subtype: Optional[int] = None,
-            conditions: Optional[dict] = None,
+            callback: Callable,
+            on_key_down: Optional[int] = None,
+            on_mouse_button: Optional[int] = None,
             kwargs: Optional[list] = None,
             as_args: bool = False
     ) -> str:

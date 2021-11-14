@@ -21,22 +21,21 @@ class EventManager:
     def subscribe(
             self,
             callback: Callable,
-            event_type: int,
-            subtype: Optional[int] = None,
-            conditions: Optional[dict] = None,
+            on_key_down: Optional[int] = None,
+            on_mouse_button: Optional[int] = None,
+            on_event: Optional[int] = None,
             kwargs: Optional[list] = None,
             as_args: bool = False
     ) -> str:
         """Subscribe some callback to event
 
-        :param event_type: Should be one of pygame events, like `pygame.KEYDOWN`
+        :param on_key_down: Subscribe on key pressed on keyboard.
+        :param on_mouse_button: Subscribe on mouse button click.
+        :param on_event: Subscribe on specific event.
         :param callback: Callback method to handle event.
             Method interface may be generic(*args, **kwargs) - use param `kwargs`
              to say which attributes from Event object shold be passed as their
              names **kwargs in callback, set `as_args=True` to pass it as *args.
-        :param subtype: Used for user custom Event types. TODO: not fully implemented
-        :param conditions: Use to check some Event attribute with value in this
-            dict stored in key as attribute name.
         :param kwargs: List of Event attributes names that should be passed to
             callback.
         :param as_args: If `True`, **kwargs will be pass as *args with their
@@ -45,8 +44,28 @@ class EventManager:
         :return: Subscription id. Can be used to unsubscribe.
         :rtype str
         """
+        if on_key_down and on_mouse_button:
+            raise Exception("Can't subscribe on two events simultaneously.")
+
+        conditions = None
+
+        if on_key_down:
+            event_type = pygame.KEYDOWN
+            conditions = {"key": on_key_down}
+        elif on_mouse_button:
+            event_type = pygame.MOUSEBUTTONDOWN
+            conditions = {"button": on_mouse_button}
+        elif on_event:
+            event_type = on_event
+        else:
+            raise Exception("One of `on_key_down` or `on_mouse_button` should be passed. ")
+
         subscription = EventSubscription(
-            callback, event_type, subtype, conditions, kwargs, as_args
+            callback=callback,
+            event_type=event_type,
+            conditions=conditions,
+            kwargs=kwargs,
+            as_args=as_args
         )
         self.__store.add(subscription)
 
@@ -63,8 +82,10 @@ class EventManager:
 
         TODO: looks like not enough useful method, may be should be removed.
         """
-        logger.debug(f"Manual dispatching <{event_type}> "
-                         f"with kwargs <{kwargs}>.")
+
+        logger.debug(
+            f"Manual dispatching <{event_type}> with kwargs <{kwargs}>."
+        )
 
         event = pygame.event.Event(event_type, kwargs)
         pygame.event.post(event)
@@ -98,8 +119,8 @@ class EventManager:
             else:
                 subscription.callback(**kwargs)
 
-    def __extract_kwargs(self,
-                         event: pygame.event.Event,
+    @staticmethod
+    def __extract_kwargs(event: pygame.event.Event,
                          kwargs_list: List[str]) -> dict:
         if kwargs_list is None:
             return {}
@@ -111,7 +132,7 @@ class EventManager:
             }
         except AttributeError:
             logger.exception(
-                f"Try get kwargs <{kwargs_list}> for callback, but event <{event}>"
-                f" has no some attrs."
+                f"Try get kwargs <{kwargs_list}> for callback, but event "
+                f"<{event}> has no some attrs."
             )
             raise

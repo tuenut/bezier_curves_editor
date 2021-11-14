@@ -3,6 +3,10 @@ from typing import Callable, Any, Union, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
+LMB = 1
+MMB = 2
+RMB = 3
+
 
 class EventSubscription:
     callback: Callable[[Any], None]
@@ -19,6 +23,24 @@ class EventSubscription:
                  conditions: Optional[Dict[str, Any]] = None,
                  kwargs: Optional[List[str]] = None,
                  as_args: bool = False):
+        """
+        :param event_type: Should be one of pygame events, like `pygame.KEYDOWN`
+        :param callback: Callback method to handle event.
+            Method interface may be generic(*args, **kwargs) - use param `kwargs`
+             to say which attributes from Event object shold be passed as their
+             names **kwargs in callback, set `as_args=True` to pass it as *args.
+        :param subtype: Used for user custom Event types. TODO: not fully implemented
+        :param conditions: Use to check some Event attribute with value in this
+            dict stored in key as attribute name.
+        :param kwargs: List of Event attributes names that should be passed to
+            callback.
+        :param as_args: If `True`, **kwargs will be pass as *args with their
+            position in `kwargs` param.
+
+        :return: Subscription id. Can be used to unsubscribe.
+        :rtype str
+        """
+
         logger.debug(
             f"Subscribe callback <{callback}> on event_type <{event_type}>."
         )
