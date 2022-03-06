@@ -1,7 +1,7 @@
 import json
-from typing import List, Tuple
-
 import pygame
+
+from typing import List, Tuple
 
 from app.events import EventManager
 from app.events.subscriptions import LMB, RMB

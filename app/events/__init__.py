@@ -1,11 +1,12 @@
 import logging
-from typing import Callable, Optional, List
-
 import pygame
+
+from typing import Callable, Optional, List
 
 from app.events.store import SubscriptionsStore
 from app.events.subscriptions import EventSubscription
 from utils.decorators import as_singleton
+
 
 logger = logging.getLogger(__name__)
 
@@ -104,4 +105,3 @@ class EventManager:
                 continue
 
             subscription.callback(event)
-

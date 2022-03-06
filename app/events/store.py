@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from collections import defaultdict
-
 import logging
 
+from collections import defaultdict
 from typing import Dict
 
 from app.events.subscriptions import EventSubscription
+
 
 logger = logging.getLogger(__name__)
 

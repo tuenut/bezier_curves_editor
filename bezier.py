@@ -3,9 +3,9 @@ The code from [[here | https://www.drdobbs.com/forward-difference-calculation-of
  is taken as a basis for working with bezier curves
 """
 
-from typing import Union, List, Tuple
-
 import pygame
+
+from typing import Union, List, Tuple
 
 from utils.types import ABCBezierCurve
 

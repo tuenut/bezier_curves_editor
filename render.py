@@ -4,6 +4,7 @@ from typing import List
 
 from utils.types import AppStateType, ABCBezierCurve
 
+
 gray = pygame.Color(100, 100, 100)
 lightgray = pygame.Color(200, 200, 200)
 red = pygame.Color(255, 0, 0)

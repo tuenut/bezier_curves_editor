@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+import pygame
+
 from typing import TypedDict, Union, Tuple, List, Optional, Callable
 
-import pygame
+from abc import ABC, abstractmethod
 
 
 class ABCBezierCurve(ABC):
