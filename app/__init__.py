@@ -5,13 +5,13 @@ from typing import List, Tuple
 
 from app.events import EventManager
 from app.events.subscriptions import LMB, RMB
-from bezier import BezierCurve
+from bezier import BezierCurve, BezierCurvesBunch
 from render import AppRender
 from utils.types import ABCBaseApp
 
 
 class BaseApp(ABCBaseApp):
-    _curves: List[BezierCurve]
+    _curves: List[BezierCurvesBunch]
 
     _mouse_LMB_event_id = None
     _mouse_RMB_event_id = None
@@ -30,7 +30,7 @@ class BaseApp(ABCBaseApp):
     }
 
     @property
-    def curves(self) -> List[BezierCurve]:
+    def curves(self) -> List[BezierCurvesBunch]:
         if self._temp_curve:
             return [*self._curves, self._temp_curve]
         else:
@@ -39,6 +39,8 @@ class BaseApp(ABCBaseApp):
 
 class CurveCreatingMixin(BaseApp):
     def _add_curve(self, event: pygame.event.Event):
+        """Command to eneter in 'Create curve mode'."""
+
         self.state["mode"] = self.MODE_CURVE_CREATING
 
         self.events.unsubscribe(self._mouse_LMB_event_id)
@@ -52,9 +54,11 @@ class CurveCreatingMixin(BaseApp):
             callback=self._interrupt_adding_curve,
         )
 
-        self._temp_curve = BezierCurve()
+        self._temp_curve = BezierCurvesBunch()
 
     def _interrupt_adding_curve(self, event: pygame.event.Event):
+        """Interrupt 'Create curve mode' and delete not finished curve."""
+
         del self._temp_curve
         self._temp_curve = None
 
@@ -68,7 +72,7 @@ class CurveCreatingMixin(BaseApp):
 
         self._temp_curve.add_vertex(pygame.Vector2(mouse_position))
 
-        if len(self._temp_curve.vertices) == 4 and not self._enter_event_id:
+        if len(self._temp_curve.vertices) % 4 == 0 and not self._enter_event_id:
             self.state["mode"] = self.MODE_CURVE_COMPLETION
 
             self._enter_event_id = self.events.subscribe(
@@ -144,7 +148,7 @@ class DataManagement(BaseApp):
 
         for curve in self._curves:
             curve_data = {
-                "points": [(v.x, v.y) for v in curve.vectors],
+                "points": [(v.x, v.y) for v in curve.points],
                 "vertices": [(v.x, v.y) for v in curve.vertices]
             }
             data["curves"].append(curve_data)
@@ -160,6 +164,7 @@ class DataManagement(BaseApp):
             data = json.load(file)
 
         for curve in data["curves"]:
+            raise NotImplementedError("Should be rewritten for BezierCurvesBunch")
             self._curves.append(BezierCurve(curve["vertices"]))
 
 
@@ -168,7 +173,7 @@ class App(CurveCreatingMixin, CurveManipulatingMixin, DataManagement):
 
     def __init__(self):
         self.events: EventManager = EventManager()
-        self._curves: List[BezierCurve] = []
+        self._curves = []
 
         self.state = {
             "running": None,

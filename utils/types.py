@@ -14,12 +14,7 @@ class ABCBezierCurve(ABC):
     __selected_point: Union[pygame.Vector2, None] = None
 
     vertices: List[pygame.Vector2]
-    vectors: List[pygame.Vector2]
-
-    @property
-    @abstractmethod
-    def step_size(self) -> float:
-        ...
+    points: List[pygame.Vector2]
 
     @abstractmethod
     def update(self):
@@ -30,7 +25,31 @@ class ABCBezierCurve(ABC):
         ...
 
     @abstractmethod
-    def set_resolution(self, value):
+    def cancel_point_selection(self):
+        ...
+
+    @property
+    @abstractmethod
+    def _step_size(self) -> float:
+        ...
+
+    @abstractmethod
+    def _set_resolution(self, value):
+        ...
+
+
+class ABCBezierCurvesBunch(ABC):
+    curves: List[ABCBezierCurve]
+    vertices: List[pygame.Vector2]
+    __old_point_position: Union[pygame.Vector2, None] = None
+    __selected_point: Union[pygame.Vector2, None] = None
+
+    @abstractmethod
+    def update(self):
+        ...
+
+    @abstractmethod
+    def add_vertex(self, vector: Union[pygame.Vector2, Tuple[float, float]]):
         ...
 
     @abstractmethod

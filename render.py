@@ -2,7 +2,7 @@ import pygame
 
 from typing import List
 
-from utils.types import AppStateType, ABCBezierCurve
+from utils.types import AppStateType, ABCBezierCurve, ABCBezierCurvesBunch
 
 
 gray = pygame.Color(100, 100, 100)
@@ -48,13 +48,14 @@ class AppRender:
         ### Flip screen
         pygame.display.flip()
 
-    def _draw_curve(self, curve: ABCBezierCurve):
+    def _draw_curve(self, curve_bunch: ABCBezierCurvesBunch):
         ### Draw control points
-        for p in curve.vertices:
+        for p in curve_bunch.vertices:
             pygame.draw.circle(self.screen, blue, (int(p.x), int(p.y)), 4)
 
-        if len(curve.vertices) == 4 and curve.vectors:
-            ### Draw control "lines"
-            pygame.draw.lines(self.screen, lightgray, False, curve.vertices)
-            ### Draw bezier curve
-            pygame.draw.lines(self.screen, red, False, curve.vectors, 2)
+        for curve in curve_bunch.curves:
+            if len(curve.vertices) == 4 and curve.points:
+                ### Draw control "lines"
+                pygame.draw.lines(self.screen, lightgray, False, curve.vertices)
+                ### Draw bezier curve
+                pygame.draw.lines(self.screen, red, False, curve.points, 2)
