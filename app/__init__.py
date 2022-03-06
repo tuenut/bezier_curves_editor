@@ -129,6 +129,7 @@ class CurveManipulatingMixin(BaseApp):
         self.state["selected_point"] = None
 
         self._set_mouse_default()
+        self._set_escape_default()
 
     def _cancel_point_selection(self, event: pygame.event.Event):
         self.state["selected_curve"].cancel_point_selection()
@@ -136,6 +137,7 @@ class CurveManipulatingMixin(BaseApp):
         self.state["selected_point"] = None
 
         self._set_mouse_default()
+        self._set_escape_default()
 
     def _add_point_to_curve(self):
         raise NotImplementedError
