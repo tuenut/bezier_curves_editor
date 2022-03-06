@@ -97,11 +97,11 @@ class CurveManipulatingMixin(BaseApp):
     def _select_point(self, event: pygame.event.Event):
         pos = pygame.Vector2(event.pos)
 
-        for curve in self.curves:
-            for point in curve.vertices:
+        for curve_bunch in self.curves:
+            for point in curve_bunch.vertices:
                 if abs(point.x - pos.x) < 5 and abs(point.y - pos.y) < 5:
-                    self.state["selected_point"] = curve.select_point(point)
-                    self.state["selected_curve"] = curve
+                    self.state["selected_point"] = curve_bunch.select_point(point)
+                    self.state["selected_curve"] = curve_bunch
 
                     self._set_events_for_moving_point()
                     return
@@ -150,7 +150,6 @@ class DataManagement(BaseApp):
 
         for curve in self._curves:
             curve_data = {
-                "points": [(v.x, v.y) for v in curve.points],
                 "vertices": [(v.x, v.y) for v in curve.vertices]
             }
             data["curves"].append(curve_data)

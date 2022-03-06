@@ -22,6 +22,9 @@ class BezierCurvesBunch(ABCBezierCurvesBunch):
         self.curves = [BezierCurve(), ]
         self.vertices = []
 
+        self.__selected_curve = None
+        self.__selected_point = None
+
         logger.debug(f"Create new curves bunch <{self}>")
 
     def add_vertex(self, vector: Union[pygame.Vector2, Tuple[float, float]]):
@@ -41,29 +44,43 @@ class BezierCurvesBunch(ABCBezierCurvesBunch):
         self.vertices.append(vector)
 
     def cancel_point_selection(self):
-        self.vertices = []
-
         for curve in self.curves:
             if self.__selected_point in curve.vertices:
                 curve.cancel_point_selection()
+
+        self._update_vertices()
+
+        self.__selected_curve = None
+        self.__selected_point = None
+
+    def select_point(self, point) -> pygame.Vector2:
+        for curve in self.curves:
+            if point in curve.vertices:
+                if self.__selected_point is None:
+                    self.__selected_curve = curve
+                    self.__selected_point = curve.select_point(point)
+                else:
+                    curve.select_point(point, new_point=self.__selected_point)
+
+        return self.__selected_point
+
+    def save_point_position(self):
+        for curve in self.curves:
+            if self.__selected_point in curve.vertices:
+                curve.save_point_position()
+
+        self.__selected_curve = None
+        self.__selected_point = None
+
+        self._update_vertices()
+
+    def _update_vertices(self):
+        self.vertices = []
+
+        for curve in self.curves:
             for vertex in curve.vertices:
                 if vertex not in self.vertices:
                     self.vertices.append(vertex)
-
-    def select_point(self, point) -> pygame.Vector2:
-        index = self.vertices.index(point)
-        self.__old_point_position = self.vertices[index]
-        self.vertices[index] = pygame.Vector2(point)
-        self.__selected_point = self.vertices[index]
-
-        return self.vertices[index]
-
-    def save_point_position(self):
-        index = self.vertices.index(self.__selected_point)
-        self.vertices[index] = pygame.Vector2(self.__selected_point)
-
-        self.__selected_point = None
-        self.__old_point_position = None
 
     def update(self):
         for curve in self.curves:
@@ -104,6 +121,21 @@ class BezierCurve(ABCBezierCurve):
         if len(self.vertices) < 4:
             self.vertices.append(vertex)
             self.__changed = True
+
+    def select_point(self, point, new_point=None) -> pygame.Vector2:
+        index = self.vertices.index(point)
+        self.__old_point_position = self.vertices[index]
+        self.vertices[index] = new_point if new_point else pygame.Vector2(point)
+        self.__selected_point = self.vertices[index]
+
+        return self.__selected_point
+
+    def save_point_position(self):
+        index = self.vertices.index(self.__selected_point)
+        self.vertices[index] = pygame.Vector2(self.__selected_point)
+
+        self.__selected_point = None
+        self.__old_point_position = None
 
     def cancel_point_selection(self):
         index = self.vertices.index(self.__selected_point)

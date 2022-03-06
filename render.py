@@ -18,7 +18,7 @@ class AppRender:
         self.font = pygame.font.SysFont('mono', 12, bold=True)
         self.app_state = state
 
-    def update(self, curves: List[ABCBezierCurve], text):
+    def update(self, curves_bunch: List[ABCBezierCurvesBunch], text):
         ### Draw stuff
         self.screen.fill(gray)
 
@@ -27,8 +27,8 @@ class AppRender:
             selected = self.app_state["selected_point"]
             pygame.draw.circle(self.screen, green, (selected.x, selected.y), 10)
 
-        for curve in curves:
-            self._draw_curve(curve)
+        for bunch in curves_bunch:
+            self._draw(bunch)
 
         self.screen.blit(
             self.font.render(self.app_state["mode"], True, (255, 255, 255)),
@@ -48,14 +48,17 @@ class AppRender:
         ### Flip screen
         pygame.display.flip()
 
-    def _draw_curve(self, curve_bunch: ABCBezierCurvesBunch):
+    def _draw(self, curve_bunch: ABCBezierCurvesBunch):
+        for curve in curve_bunch.curves:
+            self._draw_curve(curve)
+
+    def _draw_curve(self, curve: ABCBezierCurve):
         ### Draw control points
-        for p in curve_bunch.vertices:
+        for p in curve.vertices:
             pygame.draw.circle(self.screen, blue, (int(p.x), int(p.y)), 4)
 
-        for curve in curve_bunch.curves:
-            if len(curve.vertices) == 4 and curve.points:
-                ### Draw control "lines"
-                pygame.draw.lines(self.screen, lightgray, False, curve.vertices)
-                ### Draw bezier curve
-                pygame.draw.lines(self.screen, red, False, curve.points, 2)
+        if len(curve.vertices) == 4 and curve.points:
+            ### Draw control "lines"
+            pygame.draw.lines(self.screen, lightgray, False, curve.vertices)
+            ### Draw bezier curve
+            pygame.draw.lines(self.screen, red, False, curve.points, 2)
